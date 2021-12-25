@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        .captcha-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            /*height: 200px;*/
+            /*background-color: red;*/
+            border-radius: 12px;
+            text-align: center;
+            padding: 24px;
+            font-size: 12px;
+            box-shadow: 0 0 8px 2px grey;
+        }
+
+        .captcha-box > :nth-child(2n) {
+            margin: 12px 0;
+        }
+
+        .captcha-box .header > :nth-child(2n) {
+            margin: 12px 0;
+        }
+
+        .captcha-box .header .title {
+            color: grey;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .captcha-box .header .tips {
+
+        }
+
+        .captcha-box .header .result-tips {
+            color: red;
+            max-height: 32px;
+            overflow-y: hidden;
+        }
+
+        .captcha-box .input {
+            width: 100%;
+        }
+
+        .captcha-box .image {
+            display: inline-block;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .captcha-box .image img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .captcha-box .image .captcha-image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .captcha-box .image .result-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .captcha-box .image .result-image img {
+            width: 50%;
+            height: 50%;
+        }
+
+        .captcha-box .close-button {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <span>{{message}}</span>
+    <button @click="showCaptchaBox">显示</button>
+    <div class="captcha-box" v-show="show">
+        <div class="header">
+            <div class="title">人机验证</div>
+            <div class="tips">拖动滑块，使图片显示角度为正</div>
+            <div v-show="result.show && !result.success" class="result-tips">{{result.tips}}</div>
+        </div>
+        <div class="image">
+            <div v-show="result.show" class="result-image">
+                <img v-show="result.success" src="../images/success.png" alt="">
+                <img v-show="!result.success" src="../images/error.png" alt="">
+            </div>
+            <div ref="captchaImage" class="captcha-image">
+                <!--                <img src="../images/captcha.jpeg" alt="">-->
+                <img :src="captchaSrc" alt="">
+            </div>
+        </div>
+        <input class="input" type="range" min="0" max="360" v-model="deg" :disabled="disabled" @mouseup="confirm"/>
+        <button class="close-button" @click="closeCaptchaBox">
+            点击关闭
+        </button>
+    </div>
+</div>
+
+<script>
+    let app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                message: 'Rotate-Captcha',
+                show: false,
+                disabled: false,
+                captchaSrc: "",
+                deg: 0,
+                result: {
+                    show: false,
+                    success: false,
+                    tips: "",
+                },
+            }
+        },
+        created() {
+
+        },
+        watch: {
+            deg(val, oldVal) {
+                this.$refs["captchaImage"].style.transform = `rotate(${val}deg)`
+            }
+        },
+        methods: {
+            initCaptchaBox() {
+                this.result.show = false
+                this.result.success = false
+                this.result.tips = ""
+                this.disabled = false
+                this.deg = 0
+                this.captchaSrc = `/captcha/get?t=${new Date().getTime()}`
+            },
+            showCaptchaBox() {
+                this.initCaptchaBox()
+                this.show = true
+            },
+            closeCaptchaBox() {
+                this.show = false
+            },
+            confirm() {
+                this.disabled = true;
+                axios.request({
+                    method: 'post',
+                    url: '/captcha/verify',
+                    params: {
+                        code: this.deg
+                    },
+                    // 允许携带cookie
+                    withCredentials: true
+                }).then(res => {
+                    if (res.data.data === true) {
+                        this.result.success = true
+                        let t = setTimeout(() => {
+                            this.closeCaptchaBox()
+                            clearTimeout(t)
+                        }, 3000)
+                    } else {
+                        this.result.success = false
+                        this.result.tips = "验证失败，请重试"
+                        let t = setTimeout(() => {
+                            this.initCaptchaBox()
+                            clearTimeout(t)
+                        }, 1000)
+                    }
+                })
+                    .catch(err => {
+                        this.result.success = false
+                        this.result.tips = "请求验证时出现异常, err: " + err
+
+                    })
+                    .finally(() => {
+                        this.result.show = true
+                    })
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+package person.crayon.service;
+
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
+import org.springframework.stereotype.Service;
+import person.crayon.domain.Captcha;
+
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
+/**
+ * @author Crayon
+ * @date 2021/12/25 22:21
+ * @desc 描述功能
+ */
+@Service
+public class CaptchaService {
+
+    private static final String[] IMAGES = {
+            "static/images/captcha.jpeg"
+    };
+    private static final int WIDTH = 200;
+    private static final int HEIGHT = WIDTH;
+    private static final int TOLERANCE = 10;
+
+    @Resource
+    private CacheService cacheService;
+
+    public Captcha createCaptcha() throws IOException {
+        Captcha captcha = new Captcha();
+        int deg = RandomUtil.randomInt(30, 180);
+        captcha.setKey(IdUtil.fastSimpleUUID());
+        captcha.setCode(String.valueOf(deg));
+        captcha.setImage(createImage(-deg));
+        cacheService.set(captcha.getKey(), captcha);
+        return captcha;
+    }
+
+    private Image createImage(int deg) throws IOException {
+        File file = FileUtil.file(IMAGES[RandomUtil.randomInt(IMAGES.length)]);
+        Image image = ImgUtil.scale(ImageIO.read(file), WIDTH, HEIGHT);
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        image = ImgUtil.rotate(image, deg);
+        image = ImgUtil.cut(image, new Rectangle((image.getWidth(null) - width) >> 1, (image.getHeight(null) - height) >> 1, width, height));
+        return image;
+    }
+
+    public boolean verify(String key, String code) {
+        Captcha captcha = cacheService.get(key, Captcha.class);
+        int codeInt = Integer.parseInt(code);
+        int captchaInt = Integer.parseInt(captcha.getCode());
+        return Math.abs(captchaInt - codeInt) < TOLERANCE;
+    }
+
+
+}
