@@ -195,7 +195,7 @@
                 })
                     .catch(err => {
                         this.result.success = false
-                        this.result.tips = "请求验证时出现异常, err: " + err
+                        this.result.tips = "请求验证时出现异常, err: " + err.message
 
                     })
                     .finally(() => {

@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * @author Crayon
  * @date 2021/12/25 22:21
- * @desc 描述功能
+ * @desc 验证码生成服务
  */
 @Service
 public class CaptchaService {
@@ -46,7 +46,9 @@ public class CaptchaService {
         Image image = ImgUtil.scale(ImageIO.read(file), WIDTH, HEIGHT);
         int width = image.getWidth(null);
         int height = image.getHeight(null);
+        // 图片旋转
         image = ImgUtil.rotate(image, deg);
+        // 需要进行裁剪，旋转后的图片会变大出现黑边，裁剪为原图形大小相同的内接圆大小的正方形即可
         image = ImgUtil.cut(image, new Rectangle((image.getWidth(null) - width) >> 1, (image.getHeight(null) - height) >> 1, width, height));
         return image;
     }
