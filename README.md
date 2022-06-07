@@ -1,11 +1,11 @@
-# Classic-Small-Garbage
+# demo-bucket
 
-集合一些开发中可能有用的小案例
+案例集合
 
 ## 目录结构
 
 ```bash
-|-- classic-small-garbage
+|-- demo-bucket
     |-- captcha # 验证码相关案例
     |   |-- jigsaw-captcha # 拼图验证码
     |   |-- rotate-captcha # 旋转验证码
