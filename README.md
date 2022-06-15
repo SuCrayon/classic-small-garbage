@@ -4,9 +4,10 @@
 
 ## 目录结构
 
-```bash
+```markdown
 captcha: 验证码
 rate-limit: 限流
 zookeeper-demo: zookeeper客户端使用实例
+git-demo: git使用案例
 ```
 
