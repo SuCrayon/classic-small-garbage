@@ -1,4 +1,4 @@
-package person.crayon;
+package person.crayon.zookeeper.demo.nativeclient;
 
 import org.apache.zookeeper.*;
 import org.junit.Test;

@@ -1,11 +1,10 @@
-package person.crayon;
+package person.crayon.zookeeper.demo.nativeclient;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.concurrent.CountDownLatch;
 
 /**
