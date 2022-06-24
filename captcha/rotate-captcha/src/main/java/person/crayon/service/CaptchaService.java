@@ -50,6 +50,8 @@ public class CaptchaService {
         image = ImgUtil.rotate(image, deg);
         // 需要进行裁剪，旋转后的图片会变大出现黑边，裁剪为原图形大小相同的内接圆大小的正方形即可
         image = ImgUtil.cut(image, new Rectangle((image.getWidth(null) - width) >> 1, (image.getHeight(null) - height) >> 1, width, height));
+        // NEW: 切成圆形
+        image = ImgUtil.cut(image, 0,0, WIDTH >> 1);
         return image;
     }
 
