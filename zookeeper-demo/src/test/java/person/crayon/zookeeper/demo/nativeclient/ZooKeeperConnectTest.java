@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
  * 客户端连接
  */
 public class ZooKeeperConnectTest {
-    private static final String CONNECT_STRING = "localhost:2181";
+    private static final String CONNECT_STRING = "centos-0:2181";
 
     public static ZooKeeper getConnect(Watcher watcher) throws IOException {
         return new ZooKeeper(CONNECT_STRING, 4000, watcher);
@@ -27,7 +27,7 @@ public class ZooKeeperConnectTest {
     @Test
     public void test() throws IOException, InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
-        ZooKeeper zooKeeper = new ZooKeeper("localhost:2181", 4000, new Watcher() {
+        ZooKeeper zooKeeper = new ZooKeeper(CONNECT_STRING, 4000, new Watcher() {
             public void process(WatchedEvent watchedEvent) {
                 if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
                     // 如果收到了服务端的响应事件：连接成功
