@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-world
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - name: hello-world
+    image: "ubuntu:18.04"
+    command: ["/bin/echo", "hello", "world"]
