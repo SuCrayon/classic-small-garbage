@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-exec-pod
+  labels:
+    test: readiness
+spec:
+  containers:
+  - name: readiness
+    image: "ubuntu:18.04"
+    command: ["/bin/sh", "-c", "echo ok > /tmp/ready; sleep 60; rm -rf /tmp/ready; sleep 600"]
+    readinessProbe:
+      exec:
+        command: ["cat", "/tmp/ready"]
+      initialDelaySeconds: 15
+      timeoutSeconds: 1  
+        
