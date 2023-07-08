@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: w-message-pod
+spec:
+  containers:
+  - name: messager
+    image: "ubuntu:18.04"
+    terminationMessagePath: /dev/termination-log
+    command:
+      - "bash"
+      - "-c"
+      - "echo \"`date --rfc-3339 ns` I was going to die\" >> /dev/termination-log;"
