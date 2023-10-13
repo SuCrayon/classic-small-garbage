@@ -1,4 +1,4 @@
-package compare_version_numbers
+package LC165_compare_version_numbers
 
 import "testing"
 
