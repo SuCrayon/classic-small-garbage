@@ -1,0 +1,24 @@
+{
+  "took": 122,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": null,
+    "hits": [
+      {
+        "_index": "goods",
+        "_id": "AVYkNv542Gim_t2htKPU",
+        "_score": null,
+        "_source": {
+          "name": "商品1",
+          "price": 12.0
+        }
+      }
+    ]
+  }
+}
