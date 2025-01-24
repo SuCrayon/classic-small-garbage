@@ -1,0 +1,28 @@
+# 批量插入0-99的kv
+- ot: insert_range
+  input:
+    range_start: 0
+    range_end: 10000
+# k=-1，不存在
+- ot: search
+  input:
+    key: -1
+  output:
+    ok: false
+# k=99，存在且v=99
+- ot: search
+  input:
+    key: 99
+  output:
+    ok: true
+    value: 99
+- ot: delete
+  input:
+    key: 99
+  output:
+    ok: true
+- ot: search
+  input:
+    key: 99
+  output:
+    ok: false

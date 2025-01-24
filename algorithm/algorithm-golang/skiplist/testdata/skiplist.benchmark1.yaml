@@ -1,0 +1,5 @@
+# 批量插入0-99的kv
+- ot: insert_range
+  input:
+    range_start: 0
+    range_end: 10000
