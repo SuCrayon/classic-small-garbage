@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	MaxLevel = 1
+	MaxLevel = 32
 	P        = 0.5
 )
 
@@ -17,8 +17,10 @@ type (
 	}
 
 	SkipList struct {
-		Head  *Node
-		Level int
+		Head     *Node
+		Level    int
+		MaxLevel int
+		P        float64
 	}
 )
 
@@ -30,28 +32,37 @@ func makeNode(key float64, value interface{}, level int) *Node {
 	}
 }
 
-func New() *SkipList {
+func New(maxLevel int, p float64) *SkipList {
 	return &SkipList{
-		Head:  makeNode(0, nil, MaxLevel),
-		Level: 1,
+		Head:     makeNode(0, nil, maxLevel),
+		Level:    1,
+		MaxLevel: maxLevel,
+		P:        p,
 	}
 }
 
-func randomLevel() int {
+func SimpleNew() *SkipList {
+	return New(MaxLevel, P)
+}
+
+func (s *SkipList) randomLevel() int {
 	level := 1
-	for level < MaxLevel && rand.Float64() < P {
+	for level < s.MaxLevel && rand.Float64() < s.P {
 		level += 1
 	}
 	return level
 }
 
 func (s *SkipList) findPrev(key float64) (x *Node, update []*Node) {
-	update = make([]*Node, MaxLevel)
+	update = make([]*Node, s.MaxLevel)
 	x = s.Head
+	// 外层循环，控制从上到下的层级搜索
 	for i := s.Level - 1; i >= 0; i-- {
+		// 内层循环，控制从左到右的前进搜索
 		for x.Forwards[i] != nil && x.Forwards[i].Key < key {
 			x = x.Forwards[i]
 		}
+		// 向下搜索前记录节点（这个节点就是待插入节点在对应层的前驱节点）
 		update[i] = x
 	}
 	return
@@ -74,7 +85,7 @@ func (s *SkipList) Insert(key float64, value interface{}) {
 		return
 	}
 
-	level := randomLevel()
+	level := s.randomLevel()
 	if level > s.Level {
 		for i := s.Level; i < level; i++ {
 			update[i] = s.Head

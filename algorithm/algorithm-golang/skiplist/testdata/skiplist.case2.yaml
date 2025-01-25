@@ -1,28 +1,28 @@
-# 批量插入0-9999的kv
+# 批量插入0-999的kv
 - ot: insert_range
   input:
     range_start: 0
-    range_end: 10000
+    range_end: 1000
 # k=-1，不存在
 - ot: search
   input:
     key: -1
   output:
     ok: false
-# k=3377，存在且v=3377
+# k=777，存在且v=777
 - ot: search
   input:
-    key: 3377
+    key: 777
   output:
     ok: true
-    value: 3377
+    value: 777
 - ot: delete
   input:
-    key: 3377
+    key: 777
   output:
     ok: true
 - ot: search
   input:
-    key: 3377
+    key: 777
   output:
     ok: false

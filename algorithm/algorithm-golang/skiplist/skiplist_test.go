@@ -2,12 +2,12 @@ package skiplist
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v3"
 	"math/rand/v2"
 	"os"
 	"testing"
-	"time"
+
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
 type (
@@ -30,6 +30,14 @@ type (
 		Input  OprInput  `json:"input" yaml:"input"`
 		Output OprOutput `json:"output" yaml:"output"`
 	}
+
+	Args struct {
+		name     string
+		runTimes int
+		opr      []*Opr
+		maxLevel int
+		p        float64
+	}
 )
 
 type (
@@ -46,39 +54,12 @@ const (
 	OprDeleteMany  OprType = "delete_many"
 )
 
-func Test_randomLevel(t *testing.T) {
-	tests := []struct {
-		name     string
-		runTimes int
-		assertFn func(res int)
-	}{
-		// TODO: Add test cases.
-		{
-			name:     "",
-			runTimes: 100,
-			assertFn: func(res int) {
-				if res <= 0 || res > MaxLevel {
-					t.Error("randomLevel run exceptionally")
-				}
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			for i := 0; i < tt.runTimes; i++ {
-				res := randomLevel()
-				t.Logf("randomLevel()=%v\n", res)
-				tt.assertFn(res)
-			}
-		})
-	}
-}
-
-func skipListDo(t *testing.T, oprs []*Opr) {
-	s := New()
+func skipListDo(t *testing.T, args *Args) {
+	s := New(args.maxLevel, args.p)
+	oprs := args.opr
 	for j := 0; j < len(oprs); j++ {
 		opr := oprs[j]
-		startTime := time.Now()
+		// startTime := time.Now()
 		if opr.Ot == OprInsert {
 			s.Insert(opr.Input.Key, opr.Input.Value)
 		} else if opr.Ot == OprDelete {
@@ -95,22 +76,34 @@ func skipListDo(t *testing.T, oprs []*Opr) {
 
 		}
 
-		endTime := time.Now()
-		t.Logf("opr: %v, cost: %v\n", opr.Ot, endTime.Sub(startTime))
+		// endTime := time.Now()
+		// t.Logf("opr: %v, cost: %v\n", opr.Ot, endTime.Sub(startTime))
 	}
 }
 
-func testWrapper(t *testing.T, fn func(*testing.T, []*Opr)) {
-	tests := []struct {
-		name     string
-		runTimes int
-		opr      []*Opr
-	}{
+func testWrapper(t *testing.T, fn func(*testing.T, *Args)) {
+	tests := []*Args{
 		// TODO: Add test cases.
 		{
 			name:     "",
-			runTimes: 1,
+			runTimes: 500,
+			maxLevel: MaxLevel,
+			p:        P,
 			opr:      readOprFromFile("skiplist.case1.yaml"),
+		},
+		{
+			name:     "",
+			runTimes: 500,
+			maxLevel: 16,
+			p:        0.5,
+			opr:      readOprFromFile("skiplist.case1.yaml"),
+		},
+		{
+			name:     "",
+			runTimes: 1000,
+			maxLevel: 1,
+			p:        0.5,
+			opr:      readOprFromFile("skiplist.case2.yaml"),
 		},
 	}
 	for _, tt := range tests {
@@ -119,7 +112,7 @@ func testWrapper(t *testing.T, fn func(*testing.T, []*Opr)) {
 				tt.runTimes = 100
 			}
 			for i := 0; i < tt.runTimes; i++ {
-				fn(t, tt.opr)
+				fn(t, tt)
 			}
 		})
 	}

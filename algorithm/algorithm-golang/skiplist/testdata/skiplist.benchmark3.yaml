@@ -2,4 +2,4 @@
 - ot: insert_range
   input:
     range_start: 0
-    range_end: 1000
+    range_end: 100000
